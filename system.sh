@@ -74,7 +74,7 @@ echo "Patching SPI0 in Device Tree..."
 # Define the replacement content exactly as requested
 export NEW_SPI_CONTENT=$(cat << 'EOF'
 status = "okay";
-  pinctrl-0 = <&spi0m0_clk &spi0m0_miso &spi0m0_mosi &spi0m0_cs0>;
+  pinctrl-0 = <&spi0m0_pins &spi0m0_cs0>;
   spidev@0 {
     status = "disabled";
   };
