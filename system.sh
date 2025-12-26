@@ -32,6 +32,31 @@ rm -rf .BoardConfig.mk
 echo "$DEVICE_ID" | ./build.sh lunch
 echo "export RK_CUSTOM_ROOTFS=../sysdrv/custom_rootfs/$ROOTFS_NAME" >> .BoardConfig.mk
 echo "export RK_BOOTARGS_CMA_SIZE=\"1M\"" >> .BoardConfig.mk
+
+# ===== ENABLE BLUETOOTH IN KERNEL =====
+echo "Configuring kernel for Bluetooth support..."
+
+KERNEL_CONFIG="sdk/sysdrv/source/kernel/arch/arm/configs/luckfox_rv1106_linux_defconfig"
+
+# Add Bluetooth config options
+cat >> "$KERNEL_CONFIG" << EOF
+
+# Bluetooth support for ESP-Hosted
+CONFIG_BT=m
+CONFIG_BT_BREDR=y
+CONFIG_BT_RFCOMM=m
+CONFIG_BT_RFCOMM_TTY=y
+CONFIG_BT_BNEP=m
+CONFIG_BT_BNEP_MC_FILTER=y
+CONFIG_BT_BNEP_PROTO_FILTER=y
+CONFIG_BT_HIDP=m
+CONFIG_BT_HCIBTUSB=m
+CONFIG_BT_HCIUART=m
+EOF
+
+echo "Bluetooth configuration added"
+# ===== END BLUETOOTH CONFIG =====
+
 # build sysdrv - rootfs
 ./build.sh uboot
 ./build.sh kernel
