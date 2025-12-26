@@ -42,6 +42,10 @@ KERNEL_CONFIG="sysdrv/source/kernel/arch/arm/configs/luckfox_rv1106_linux_defcon
 cat >> "$KERNEL_CONFIG" << EOF
 
 # Bluetooth support for ESP-Hosted
+CONFIG_CRYPTO_AES=y
+CONFIG_CRYPTO_ECDH=y
+CONFIG_ECC=y
+
 CONFIG_BT=y
 CONFIG_BT_BREDR=y
 CONFIG_BT_RFCOMM=m
@@ -52,6 +56,11 @@ CONFIG_BT_BNEP_PROTO_FILTER=y
 CONFIG_BT_HIDP=m
 CONFIG_BT_HCIBTUSB=m
 CONFIG_BT_HCIUART=m
+
+CONFIG_WIRELESS=y
+CONFIG_CFG80211=y
+CONFIG_MAC80211=y
+CONFIG_CFG80211_WEXT=y
 EOF
 
 echo "Bluetooth configuration added"
@@ -62,13 +71,8 @@ DTS_PATH="sysdrv/source/kernel/arch/arm/boot/dts/rv1103g-luckfox-pico-mini-b.dts
 
 echo "Patching SPI0 in Device Tree..."
 
-# 1. Remove the existing &spi0 block (from &spi0 { down to };)
-# This uses sed to find the range and delete it
-sed -i '/&spi0 {/,/};/d' "$DTS_PATH"
-
-# 2. Append the new configuration to the end of the file
-cat >> "$DTS_PATH" << EOF
-
+# 1. First, create a temporary file with your NEW spi0 configuration
+cat > /tmp/new_spi.dts << EOF
 &spi0 {
 	status = "okay";
 	pinctrl-0 = <&spi0m0_clk &spi0m0_miso &spi0m0_mosi &spi0m0_cs0>;
@@ -78,7 +82,18 @@ cat >> "$DTS_PATH" << EOF
 };
 EOF
 
+# 2. Use a specialized sed command to swap the old &spi0 block with the new one
+# This finds the block from &spi0 to the first }; and replaces it with the content of our file
+sed -i '/&spi0 {/,/};/ {
+    /};/ r /tmp/new_spi.dts
+    d
+}' "$DTS_PATH"
+
 echo "Device Tree patched."
+
+echo "--- DEBUG: SPI0 content in DTS ---"
+sed -n '/&spi0 {/,/};/p' "$DTS_PATH"
+echo "----------------------------------"
 
 # build sysdrv - rootfs
 ./build.sh uboot
