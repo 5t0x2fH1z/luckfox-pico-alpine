@@ -1,0 +1,46 @@
+#!/sbin/openrc-run
+
+description="ESP32 SPI hosted driver"
+
+depend() {
+    need localmount modules
+    after modules sysfs 20_bluetooth
+    before net chronyd
+}
+
+start() {
+    ebegin "Loading esp32_spi module"
+
+    rm -rf /run/wpa_supplicant/wlan0
+    
+    if ! lsmod | grep -q esp32_spi; then
+        insmod /lib/modules/esp32_spi.ko resetpin=54 clockspeed=30
+        sleep 2
+    fi
+    
+    local retry=0
+    while [ $retry -lt 10 ]; do
+        if ip link show wlan0 >/dev/null 2>&1; then
+            wpa_supplicant -B -i wlan0 -c /etc/network/wpa_supplicant.conf
+            sleep 2
+            udhcpc -i wlan0 -t 5 -q
+            sleep 2
+            eend 0
+            return 0
+        fi
+        sleep 1
+        retry=$((retry + 1))
+    done
+
+    eend 0
+}
+
+stop() {
+    ebegin "Unloading esp32_spi module"
+
+    killall udhcpc 2>/dev/null
+    killall wpa_supplicant 2>/dev/null
+    rm -rf /run/wpa_supplicant/wlan0
+    rmmod esp32_spi 2>/dev/null
+    eend 0
+}

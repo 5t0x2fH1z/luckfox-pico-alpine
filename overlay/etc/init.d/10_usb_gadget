@@ -1,3 +1,19 @@
 #!/sbin/openrc-run
 
-command="/usr/bin/usb_gadget start || true"
+depend() {
+    # Ensure it runs before services that need the partitions
+    after 00_link_mount
+}
+
+start() {
+    ebegin "Starting usb_gadget"
+    # Call the script and ensure it returns 0
+    /usr/bin/usb_gadget start || true
+    eend 0
+}
+
+stop() {
+    ebegin "Stopping usb_gadget"
+    /usr/bin/usb_gadget stop || true
+    eend 0
+}

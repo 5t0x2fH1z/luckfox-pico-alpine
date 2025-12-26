@@ -1,3 +1,21 @@
 #!/sbin/openrc-run
 
-command="/usr/bin/link_mount start || true"
+description="Link and Mount partitions"
+
+depend() {
+    # Ensure it runs before services that need the partitions
+    before sshd 30_wifi 20_bluetooth
+}
+
+start() {
+    ebegin "Starting link_mount"
+    # Call the script and ensure it returns 0
+    /usr/bin/link_mount start || true
+    eend 0
+}
+
+stop() {
+    ebegin "Stopping link_mount"
+    /usr/bin/link_mount stop || true
+    eend 0
+}

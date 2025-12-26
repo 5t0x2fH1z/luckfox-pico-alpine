@@ -12,7 +12,7 @@ rootfs_workspace_drop() {
 }
 rootfs_workspace_new() {
   mkdir -p "$ROOTFS_WORKSPACE_MNT"
-  dd if=/dev/zero of="$ROOTFS_WORKSPACE_FILE" bs=1M count=100
+  dd if=/dev/zero of="$ROOTFS_WORKSPACE_FILE" bs=1M count=120
   mkfs.ext4 "$ROOTFS_WORKSPACE_FILE"
   mount "$ROOTFS_WORKSPACE_FILE" "$ROOTFS_WORKSPACE_MNT"
 }
@@ -59,6 +59,15 @@ overlay() {
 
   ln -s "/etc/init.d/10_usb_gadget" \
     "$ROOTFS_WORKSPACE_MNT/etc/runlevels/default/10_usb_gadget"
+  
+  ln -s "/etc/init.d/11_fix-permissions" \
+    "$ROOTFS_WORKSPACE_MNT/etc/runlevels/default/11_fix-permissions"
+
+  ln -s "/etc/init.d/20_bluetooth" \
+    "$ROOTFS_WORKSPACE_MNT/etc/runlevels/default/20_bluetooth"  
+
+  ln -s "/etc/init.d/30_wifi" \
+    "$ROOTFS_WORKSPACE_MNT/etc/runlevels/default/30_wifi"
 }
 
 overlay

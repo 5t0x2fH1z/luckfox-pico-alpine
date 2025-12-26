@@ -6,6 +6,11 @@ apk add openrc
 rc-update add devfs boot
 rc-update add procfs boot
 rc-update add sysfs boot
+
+# sshd permissions fix
+chmod +x /etc/init.d/fix-permissions
+rc-update add fix-permissions default
+
 rc-update add networking default
 rc-update add local default
 
@@ -23,10 +28,24 @@ apk del -r shadow
 apk add openssh
 rc-update add sshd default
 
+# ntp for working internet
+rc-update add ntpd default
+rc-service ntpd start
+
 # Extra stuff
 apk add mtd-utils-ubi
 apk add bottom
 apk add neofetch
+
+# bluez
+apk add bluez
+rc-update add bluetooth default
+
+# wpa_supplicant
+apk add wpa_supplicant
+
+# python3
+apk add python3
 
 # Clear apk cache
 rm -rf /var/cache/apk/*
