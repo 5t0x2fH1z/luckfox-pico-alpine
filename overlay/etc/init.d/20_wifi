@@ -10,8 +10,8 @@ start() {
     ebegin "Loading cfg80211 module"
     insmod /oem/usr/ko/cfg80211.ko || eend 1
 
-    ebegin "Loading esp32_spi_s3 module"
-    insmod /root/esp32_spi_s3.ko resetpin=54 clockspeed=30 || eend 1
+    ebegin "Loading esp32_spi module"
+    insmod /oem/usr/ko/esp32_spi.ko resetpin=54 clockspeed=30 || eend 1
 
     eend 0
 }

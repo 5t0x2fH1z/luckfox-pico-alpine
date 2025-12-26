@@ -29,8 +29,8 @@ apk add bottom
 apk add neofetch
 
 # esp-hosted wifi
-chmod +x /etc/init.d/esphosted
-rc-update add esphosted default
+chmod +x /etc/init.d/20_wifi
+rc-update add 20_wifi default
 
 # bluez
 apk add bluez
