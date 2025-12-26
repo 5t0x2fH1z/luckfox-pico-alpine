@@ -38,15 +38,16 @@ echo "Configuring kernel for Bluetooth support..."
 
 echo "Find kernel config"
 # Find kernel config
-  ls -la "sdk/sysdrv/source/kernel/"
-  ls -la "sdk/sysdrv/source/kernel/configs"
-  ls -la "sdk/sysdrv/source/kernel/arch/"
-  ls -la "sdk/sysdrv/source/kernel/arch/configs"
-  ls -la "sdk/sysdrv/source/kernel/arch/arm/configs/"
+  pwd
+  ls -la "sysdrv/source/kernel/"
+  ls -la "sysdrv/source/kernel/configs"
+  ls -la "sysdrv/source/kernel/arch/"
+  ls -la "sysdrv/source/kernel/arch/configs"
+  ls -la "sysdrv/source/kernel/arch/arm/configs/"
   exit 1
 
 
-KERNEL_CONFIG="sdk/sysdrv/source/kernel/arch/arm/configs/luckfox_rv1106_linux_defconfig"
+KERNEL_CONFIG="sysdrv/source/kernel/arch/arm/configs/luckfox_rv1106_linux_defconfig"
 
 # Add Bluetooth config options
 cat >> "$KERNEL_CONFIG" << EOF
