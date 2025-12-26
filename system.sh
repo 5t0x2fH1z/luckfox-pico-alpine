@@ -51,7 +51,18 @@ fi
 SDK_ROOT="$(pwd)"
 
 # Kernel source path (relative to sdk/)
-KERNEL_SRC="$SDK_ROOT/sysdrv/source/objs_kernel"
+# Find kernel source path
+if [ -d "$SDK_ROOT/sysdrv/source/kernel" ]; then
+  KERNEL_SRC="$SDK_ROOT/sysdrv/source/kernel"
+elif [ -d "$SDK_ROOT/kernel" ]; then
+  KERNEL_SRC="$SDK_ROOT/kernel"
+else
+  echo "ERROR: Cannot find kernel source directory"
+  ls -la "$SDK_ROOT/sysdrv/source/"
+  exit 1
+fi
+
+echo "Using kernel at: $KERNEL_SRC"
 
 # Toolchain path (absolute)
 TOOLCHAIN_PATH="$SDK_ROOT/tools/linux/toolchain/arm-rockchip830-linux-uclibcgnueabihf/bin/arm-rockchip830-linux-uclibcgnueabihf-"
@@ -68,7 +79,7 @@ make -j8 target=spi \
   ARCH=arm
 
 # Copy module to drivers
-cp esp32_spi.ko "$SDK_ROOT/output/out/oem/usr/ko/" || echo "Warning: Could not copy esp32_spi.ko"
+cp esp32_spi.ko "$SDK_ROOT/sysdrv/out/kernel_drv_ko/" || echo "Warning: Could not copy esp32_spi.ko"
 popd || exit
 
 # Return explicitly to SDK root
