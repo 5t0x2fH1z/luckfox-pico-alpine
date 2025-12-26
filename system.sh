@@ -42,7 +42,7 @@ KERNEL_CONFIG="sysdrv/source/kernel/arch/arm/configs/luckfox_rv1106_linux_defcon
 cat >> "$KERNEL_CONFIG" << EOF
 
 # Bluetooth support for ESP-Hosted
-CONFIG_BT=m
+CONFIG_BT=y
 CONFIG_BT_BREDR=y
 CONFIG_BT_RFCOMM=m
 CONFIG_BT_RFCOMM_TTY=y
@@ -56,6 +56,29 @@ EOF
 
 echo "Bluetooth configuration added"
 # ===== END BLUETOOTH CONFIG =====
+
+# ===== CONFIGURE DEVICE TREE (SPI0) =====
+DTS_PATH="sysdrv/source/kernel/arch/arm/boot/dts/rv1103g-luckfox-pico-mini-b.dts"
+
+echo "Patching SPI0 in Device Tree..."
+
+# 1. Remove the existing &spi0 block (from &spi0 { down to };)
+# This uses sed to find the range and delete it
+sed -i '/&spi0 {/,/};/d' "$DTS_PATH"
+
+# 2. Append the new configuration to the end of the file
+cat >> "$DTS_PATH" << EOF
+
+&spi0 {
+	status = "okay";
+	pinctrl-0 = <&spi0m0_clk &spi0m0_miso &spi0m0_mosi &spi0m0_cs0>;
+	spidev@0 {
+		status = "disabled";
+	};
+};
+EOF
+
+echo "Device Tree patched."
 
 # build sysdrv - rootfs
 ./build.sh uboot

@@ -34,10 +34,12 @@ apk add bluez
 # wpa_supplicant
 apk add wpa_supplicant
 
+# for spi tests
+apk add spi-tools
+
 # ssh fix
-mkdir /var/empty
-chown -R root:root /var/empty
-chmod 755 /var/empty
+chown root:root /var/empty
+chmod 555 /var/empty
 
 # esp-hosted wifi
 chmod +x /etc/init.d/20_wifi
