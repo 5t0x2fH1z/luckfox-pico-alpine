@@ -72,15 +72,19 @@ DTS_PATH="sysdrv/source/kernel/arch/arm/boot/dts/rv1103g-luckfox-pico-mini-b.dts
 echo "Patching SPI0 in Device Tree..."
 
 # Define the replacement content exactly as requested
-NEW_SPI_CONTENT='status = "okay";
+export NEW_SPI_CONTENT=$(cat << 'EOF'
+status = "okay";
   pinctrl-0 = <&spi0m0_clk &spi0m0_miso &spi0m0_mosi &spi0m0_cs0>;
   spidev@0 {
     status = "disabled";
-  };'
+  };
+EOF
+)
 
-# Pass the content as an environment variable to Perl (safest for special characters like @)
-export NEW_SPI_CONTENT
+# Using single quotes for the perl command ensures Bash doesn't touch the regex
+# $ENV{...} is the internal Perl way to grab the exported bash variable
 perl -i -0777 -pe 's/(&spi0 \{).*?(\n\};)/$1\n$ENV{NEW_SPI_CONTENT}$2/s' "$DTS_PATH"
+
 echo "Device Tree patched."
 
 echo "--- DEBUG: SPI0 content in DTS ---"
