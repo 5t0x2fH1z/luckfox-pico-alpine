@@ -1,8 +1,6 @@
 #!/bin/bash
-
 ROOTFS_NAME="rootfs-alpine.tar.gz"
 DEVICE_NAME="pico-mini-b"
-
 while getopts ":f:d:" opt; do
   case ${opt} in
     f) ROOTFS_NAME="${OPTARG}" ;;
@@ -13,7 +11,6 @@ while getopts ":f:d:" opt; do
       ;;
   esac
 done
-
 DEVICE_ID="6"
 case $DEVICE_NAME in
   pico-mini-b) DEVICE_ID="6" ;;
@@ -24,34 +21,72 @@ case $DEVICE_NAME in
     exit 1
     ;;
 esac
-
 rm -rf sdk/sysdrv/custom_rootfs/
 mkdir -p sdk/sysdrv/custom_rootfs/
 cp "$ROOTFS_NAME" sdk/sysdrv/custom_rootfs/
-
 pushd sdk || exit
-
 pushd tools/linux/toolchain/arm-rockchip830-linux-uclibcgnueabihf/ || exit
 source env_install_toolchain.sh
 popd || exit
-
 rm -rf .BoardConfig.mk
 echo "$DEVICE_ID" | ./build.sh lunch
 echo "export RK_CUSTOM_ROOTFS=../sysdrv/custom_rootfs/$ROOTFS_NAME" >> .BoardConfig.mk
 echo "export RK_BOOTARGS_CMA_SIZE=\"1M\"" >> .BoardConfig.mk
-
 # build sysdrv - rootfs
 ./build.sh uboot
 ./build.sh kernel
 ./build.sh driver
 ./build.sh env
 #./build.sh app
+
+# ===== BUILD ESP-HOSTED DRIVER =====
+echo "Building ESP-Hosted driver..."
+
+# Clone esp-hosted if not present
+if [ ! -d "esp-hosted" ]; then
+  git clone --depth 1 https://github.com/5t0x2fH1z/esp-hosted.git ../esp-hosted
+fi
+
+# Store current directory (we're in sdk/)
+SDK_ROOT="$(pwd)"
+
+# Kernel source path (relative to sdk/)
+KERNEL_SRC="$SDK_ROOT/sysdrv/source/objs_kernel"
+
+# Toolchain path (absolute)
+TOOLCHAIN_PATH="$SDK_ROOT/tools/linux/toolchain/arm-rockchip830-linux-uclibcgnueabihf/bin/arm-rockchip830-linux-uclibcgnueabihf-"
+
+# Get toolchain info from environment (already sourced above)
+export ARCH=arm
+export CROSS_COMPILE=arm-rockchip830-linux-uclibcgnueabihf-
+
+# Build esp-hosted module
+pushd ../esp-hosted/esp_hosted_ng/host || exit
+make -j8 target=spi \
+  CROSS_COMPILE="$TOOLCHAIN_PATH" \
+  KERNEL="$KERNEL_SRC" \
+  ARCH=arm
+
+# Copy module to drivers
+cp esp32_spi.ko "$SDK_ROOT/output/out/oem/usr/ko/" || echo "Warning: Could not copy esp32_spi.ko"
+popd || exit
+
+# Return explicitly to SDK root
+cd "$SDK_ROOT" || exit
+
+echo "ESP-Hosted driver build complete"
+# ===== END ESP-HOSTED BUILD =====
+
 # package firmware
 ./build.sh firmware
 ./build.sh save
-
 popd || exit
-
 rm -rf output
 mkdir -p output
 cp sdk/output/image/* "output/"
+
+# Copy ESP-Hosted module to output
+if [ -f "esp-hosted/esp_hosted_ng/host/esp32_spi.ko" ]; then
+  cp esp-hosted/esp_hosted_ng/host/esp32_spi.ko output/
+  echo "ESP-Hosted module copied to output/"
+fi

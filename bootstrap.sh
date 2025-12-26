@@ -31,6 +31,14 @@ apk add neofetch
 # bluez
 apk add bluez
 
+# wpa_supplicant
+apk add wpa_supplicant
+
+# ssh fix
+mkdir /var/empty
+chmod 755 /var/empty
+chown -R root:root /var/empty
+
 # esp-hosted wifi
 chmod +x /etc/init.d/20_wifi
 rc-update add 20_wifi default

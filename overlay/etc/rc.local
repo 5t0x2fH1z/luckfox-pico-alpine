@@ -1,2 +1,0 @@
-mkdir /var/empty
-chmod 0755 /var/empty
