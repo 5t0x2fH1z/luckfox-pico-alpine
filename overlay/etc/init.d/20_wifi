@@ -7,6 +7,13 @@ depend() {
 }
 
 start() {
+    ebegin "Loading esp-hosted dependensies"
+    insmod /oem/usr/ko/ecc.ko
+    insmod /oem/usr/ko/libaes.ko
+    insmod /oem/usr/ko/aes_generic.ko
+    insmod /oem/usr/ko/ecdh_generic.ko
+    insmod /oem/usr/ko/bluetooth.ko
+
     ebegin "Loading cfg80211 module"
     insmod /oem/usr/ko/cfg80211.ko || eend 1
 
