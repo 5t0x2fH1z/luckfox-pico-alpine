@@ -1,0 +1,27 @@
+#!/sbin/openrc-run
+
+description="ESP32 SPI hosted driver"
+
+depend() {
+    need localmount
+}
+
+start() {
+    ebegin "Loading cfg80211 module"
+    insmod /oem/usr/ko/cfg80211.ko || eend 1
+
+    ebegin "Loading esp32_spi_s3 module"
+    insmod /root/esp32_spi_s3.ko resetpin=54 clockspeed=30 || eend 1
+
+    eend 0
+}
+
+stop() {
+    ebegin "Unloading esp32_spi module"
+    rmmod esp32_spi 2>/dev/null
+
+    ebegin "Unloading cfg80211 module"
+    rmmod cfg80211 2>/dev/null
+
+    eend 0
+}
