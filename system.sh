@@ -71,28 +71,21 @@ DTS_PATH="sysdrv/source/kernel/arch/arm/boot/dts/rv1103g-luckfox-pico-mini-b.dts
 
 echo "Patching SPI0 in Device Tree..."
 
-# 1. First, create a temporary file with your NEW spi0 configuration
-cat > /tmp/new_spi.dts << EOF
-&spi0 {
-	status = "okay";
-	pinctrl-0 = <&spi0m0_clk &spi0m0_miso &spi0m0_mosi &spi0m0_cs0>;
-	spidev@0 {
-		status = "disabled";
-	};
-};
-EOF
+# Define the replacement content exactly as requested
+# Note: No backslashes needed for Perl logic
+NEW_SPI_CONTENT='status = "okay";
+  pinctrl-0 = <&spi0m0_clk &spi0m0_miso &spi0m0_mosi &spi0m0_cs0>;
+  spidev@0 {
+    status = "disabled";
+  };'
 
-# 2. Use a specialized sed command to swap the old &spi0 block with the new one
-# This finds the block from &spi0 to the first }; and replaces it with the content of our file
-sed -i '/&spi0 {/,/};/ {
-    /};/ r /tmp/new_spi.dts
-    d
-}' "$DTS_PATH"
-
+# Use Perl to swap the guts of the &spi0 block in-place
+# It finds &spi0 { ... }; and replaces everything between the braces
+perl -i -0777 -pe "s/(&spi0 \{).*?(\n\};)/\$1\n$NEW_SPI_CONTENT\$2/s" "$DTS_PATH"
 echo "Device Tree patched."
 
 echo "--- DEBUG: SPI0 content in DTS ---"
-sed -n '/&spi0 {/,/};/p' "$DTS_PATH"
+cat "$DTS_PATH"
 echo "----------------------------------"
 
 # build sysdrv - rootfs
