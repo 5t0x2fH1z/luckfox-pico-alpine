@@ -7,18 +7,8 @@ depend() {
 }
 
 start() {
-    ebegin "Loading esp-hosted dependensies"
-    insmod /oem/usr/ko/ecc.ko
-    insmod /oem/usr/ko/libaes.ko
-    insmod /oem/usr/ko/aes_generic.ko
-    insmod /oem/usr/ko/ecdh_generic.ko
-    insmod /oem/usr/ko/bluetooth.ko
-
-    ebegin "Loading cfg80211 module"
-    insmod /oem/usr/ko/cfg80211.ko || eend 1
-
     ebegin "Loading esp32_spi module"
-    insmod /oem/usr/ko/esp32_spi.ko resetpin=54 clockspeed=30 || eend 1
+    insmod /var/esp32_spi.ko resetpin=54 clockspeed=30 || eend 1
 
     eend 0
 }
@@ -26,9 +16,6 @@ start() {
 stop() {
     ebegin "Unloading esp32_spi module"
     rmmod esp32_spi 2>/dev/null
-
-    ebegin "Unloading cfg80211 module"
-    rmmod cfg80211 2>/dev/null
 
     eend 0
 }
