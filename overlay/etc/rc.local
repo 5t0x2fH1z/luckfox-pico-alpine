@@ -1,2 +1,2 @@
-mkdir /var/run/sshd
-chmod 0755 /var/run/sshd
+mkdir /var/empty
+chmod 0755 /var/empty
