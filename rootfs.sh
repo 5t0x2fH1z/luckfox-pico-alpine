@@ -31,6 +31,7 @@ docker run \
     --net host \
     --mount type=bind,source=./bootstrap.sh,target=/bootstrap.sh \
     -v "$ROOTFS_WORKSPACE_MNT:/extrootfs" \
+    --platform=linux/arm/v7 \
     arm32v7/alpine \
     /bootstrap.sh
 
