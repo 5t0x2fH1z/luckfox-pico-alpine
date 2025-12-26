@@ -28,12 +28,13 @@ apk add mtd-utils-ubi
 apk add bottom
 apk add neofetch
 
+# bluez
+apk add bluez
+
 # esp-hosted wifi
 chmod +x /etc/init.d/20_wifi
 rc-update add 20_wifi default
 
-# bluez
-apk add bluez
 
 # Clear apk cache
 rm -rf /var/cache/apk/*
