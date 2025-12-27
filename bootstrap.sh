@@ -34,9 +34,6 @@ apk add bluez
 # wpa_supplicant
 apk add wpa_supplicant
 
-# wirelss tools
-apk add iw
-
 # python3
 apk add python3
 

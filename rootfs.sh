@@ -60,19 +60,19 @@ overlay() {
   ln -s "/etc/init.d/10_usb_gadget" \
     "$ROOTFS_WORKSPACE_MNT/etc/runlevels/default/10_usb_gadget"
 
-  ln -s "/etc/init.d/20_wifi" \
-    "$ROOTFS_WORKSPACE_MNT/etc/runlevels/default/20_wifi"
+  ln -s "/etc/init.d/20_bluetooth" \
+    "$ROOTFS_WORKSPACE_MNT/etc/runlevels/default/20_bluetooth"  
 
-  ln -s "/etc/init.d/30_bluetooth" \
-    "$ROOTFS_WORKSPACE_MNT/etc/runlevels/default/30_bluetooth"  
+  ln -s "/etc/init.d/30_wifi" \
+    "$ROOTFS_WORKSPACE_MNT/etc/runlevels/default/30_wifi"
 
   # Copy esp32_spi.ko module if it exists
-  if [ -f "$OUTPUT_DIR/esp32_spi.ko" ]; then
+  if [ -f "$OVERLAY_WORKSPACE/oem/usr/ko/esp32_spi.ko" ]; then
     mkdir -p "$ROOTFS_WORKSPACE_MNT/oem/usr/ko"
-    cp "$OUTPUT_DIR/esp32_spi.ko" "$ROOTFS_WORKSPACE_MNT/oem/usr/ko/"
+    cp "$OVERLAY_WORKSPACE/oem/usr/ko/esp32_spi.ko" "$ROOTFS_WORKSPACE_MNT/oem/usr/ko/"
     echo "Copied esp32_spi.ko to rootfs"
   else
-    echo "WARNING: esp32_spi.ko not found at $OUTPUT_DIR/esp32_spi.ko"
+    echo "WARNING: esp32_spi.ko not found at $OVERLAY_WORKSPACE/oem/usr/ko/esp32_spi.ko"
   fi
 
   # ssh fix - ensure /var/empty exists
