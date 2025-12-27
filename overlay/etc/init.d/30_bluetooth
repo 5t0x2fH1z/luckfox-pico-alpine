@@ -1,0 +1,21 @@
+#!/sbin/openrc-run
+
+description="ESP32 SPI hosted driver"
+
+depend() {
+    need localmount
+}
+
+start() {
+    ebegin "Starting bluetooth service"
+    /etc/init.d/bluetooth start || eend 1
+
+    eend 0
+}
+
+stop() {
+    ebegin "Stopping bluetooth service"
+    /etc/init.d/bluetooth stop
+
+    eend 0
+}
