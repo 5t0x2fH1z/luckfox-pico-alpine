@@ -35,10 +35,10 @@ apk add bluez
 apk add wpa_supplicant
 
 # wirelss tools
-#apk add iw
+apk add iw
 
 # python3
-#apk add python3
+apk add python3
 
 # Clear apk cache
 rm -rf /var/cache/apk/*

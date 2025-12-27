@@ -134,8 +134,9 @@ make -j8 target=spi \
   KERNEL="$KERNEL_SRC" \
   ARCH=arm
 
-# Copy module to drivers
-cp esp32_spi.ko "$SDK_ROOT/sysdrv/out/kernel_drv_ko/" || echo "Warning: Could not copy esp32_spi.ko"
+# Copy module directly into the firmware staging area
+mkdir -p "$SDK_ROOT/sysdrv/custom_rootfs/oem/usr/ko"
+cp esp32_spi.ko "$SDK_ROOT/sysdrv/custom_rootfs/oem/usr/ko/"
 popd || exit
 
 # Return explicitly to SDK root

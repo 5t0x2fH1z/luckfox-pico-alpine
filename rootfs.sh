@@ -12,7 +12,7 @@ rootfs_workspace_drop() {
 }
 rootfs_workspace_new() {
   mkdir -p "$ROOTFS_WORKSPACE_MNT"
-  dd if=/dev/zero of="$ROOTFS_WORKSPACE_FILE" bs=1M count=100
+  dd if=/dev/zero of="$ROOTFS_WORKSPACE_FILE" bs=1M count=120
   mkfs.ext4 "$ROOTFS_WORKSPACE_FILE"
   mount "$ROOTFS_WORKSPACE_FILE" "$ROOTFS_WORKSPACE_MNT"
 }
@@ -75,11 +75,10 @@ overlay() {
     echo "WARNING: esp32_spi.ko not found at $OUTPUT_DIR/esp32_spi.ko"
   fi
 
-  # ssh fix - use correct path
-  if [ -d "$ROOTFS_WORKSPACE_MNT/var/empty" ]; then
-    chmod 555 "$ROOTFS_WORKSPACE_MNT/var/empty"
-    chown root:root "$ROOTFS_WORKSPACE_MNT/var/empty"
-  fi
+  # ssh fix - ensure /var/empty exists
+  mkdir -p "$ROOTFS_WORKSPACE_MNT/var/empty"
+  chmod 555 "$ROOTFS_WORKSPACE_MNT/var/empty"
+  chown root:root "$ROOTFS_WORKSPACE_MNT/var/empty"
 }
 
 overlay
