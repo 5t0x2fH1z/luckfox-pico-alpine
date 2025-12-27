@@ -134,13 +134,17 @@ make -j8 target=spi \
   KERNEL="$KERNEL_SRC" \
   ARCH=arm
 
+# Return to SDK root first
+cd "$SDK_ROOT" || exit
+
+# Now the paths are correct
 # Extract the rootfs tarball
 mkdir -p /tmp/rootfs-inject
 tar -xzf sysdrv/custom_rootfs/$ROOTFS_NAME -C /tmp/rootfs-inject/
 
-# Add the kernel module
+# Add the kernel module (use absolute path to be safe)
 mkdir -p /tmp/rootfs-inject/oem/usr/ko
-cp esp32_spi.ko /tmp/rootfs-inject/oem/usr/ko/
+cp ../esp-hosted/esp_hosted_ng/host/esp32_spi.ko /tmp/rootfs-inject/oem/usr/ko/
 
 # Repack the rootfs
 cd /tmp/rootfs-inject
@@ -148,15 +152,7 @@ tar -czf "$SDK_ROOT/sysdrv/custom_rootfs/$ROOTFS_NAME" .
 cd "$SDK_ROOT"
 rm -rf /tmp/rootfs-inject
 
-# Copy module to drivers
-# cp esp32_spi.ko "$SDK_ROOT/sysdrv/out/kernel_drv_ko/" || echo "Warning: Could not copy esp32_spi.ko"
-# Copy module directly into the firmware staging area
-# mkdir -p "$SDK_ROOT/sysdrv/custom_rootfs/oem/usr/ko"
-# cp esp32_spi.ko "$SDK_ROOT/sysdrv/custom_rootfs/oem/usr/ko/"
-# popd || exit
-
-# Return explicitly to SDK root
-cd "$SDK_ROOT" || exit
+popd || exit  # This might not be needed since we already cd'd back
 
 echo "ESP-Hosted driver build complete"
 # ===== END ESP-HOSTED BUILD =====
