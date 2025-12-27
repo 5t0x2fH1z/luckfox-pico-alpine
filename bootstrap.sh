@@ -34,17 +34,22 @@ apk add bluez
 # wpa_supplicant
 apk add wpa_supplicant
 
-# for spi tests
-apk add spi-tools
+# wirelss tools
+apk add iw
+
+# python3
+apk add python3
 
 # ssh fix
-chown root:root /var/empty
 chmod 555 /var/empty
+chown root:root /var/empty
 
 # esp-hosted wifi
 chmod +x /etc/init.d/20_wifi
 rc-update add 20_wifi default
 
+# start bluetooth
+/etc/init.d/bluetooth start
 
 # Clear apk cache
 rm -rf /var/cache/apk/*
