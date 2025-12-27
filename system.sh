@@ -87,9 +87,6 @@ perl -i -0777 -pe 's/(&spi0 \{).*?(\n\};)/$1\n$ENV{NEW_SPI_CONTENT}$2/s' "$DTS_P
 
 echo "Device Tree patched."
 
-echo "--- DEBUG: SPI0 content in DTS ---"
-cat "$DTS_PATH"
-echo "----------------------------------"
 
 # build sysdrv - rootfs
 ./build.sh uboot
