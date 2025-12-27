@@ -74,11 +74,6 @@ overlay() {
   else
     echo "WARNING: esp32_spi.ko not found at $OVERLAY_WORKSPACE/oem/usr/ko/esp32_spi.ko"
   fi
-
-  # ssh fix - ensure /var/empty exists
-  mkdir -p "$ROOTFS_WORKSPACE_MNT/var/empty"
-  chmod 555 "$ROOTFS_WORKSPACE_MNT/var/empty"
-  chown root:root "$ROOTFS_WORKSPACE_MNT/var/empty"
 }
 
 overlay

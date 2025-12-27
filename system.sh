@@ -96,12 +96,12 @@ echo "Device Tree patched."
 #./build.sh app
 
 # ===== BUILD ESP-HOSTED DRIVER =====
-# echo "Building ESP-Hosted driver..."
+echo "Building ESP-Hosted driver..."
 
 # Clone esp-hosted if not present
-# if [ ! -d "esp-hosted" ]; then
-#   git clone --depth 1 https://github.com/5t0x2fH1z/esp-hosted.git ../esp-hosted
-# fi
+if [ ! -d "esp-hosted" ]; then
+  git clone --depth 1 https://github.com/5t0x2fH1z/esp-hosted.git ../esp-hosted
+fi
 
 # Store current directory (we're in sdk/)
 SDK_ROOT="$(pwd)"
@@ -128,11 +128,25 @@ export ARCH=arm
 export CROSS_COMPILE=arm-rockchip830-linux-uclibcgnueabihf-
 
 # Build esp-hosted module
-# pushd ../esp-hosted/esp_hosted_ng/host || exit
-# make -j8 target=spi \
-#   CROSS_COMPILE="$TOOLCHAIN_PATH" \
-#   KERNEL="$KERNEL_SRC" \
-#   ARCH=arm
+pushd ../esp-hosted/esp_hosted_ng/host || exit
+make -j8 target=spi \
+  CROSS_COMPILE="$TOOLCHAIN_PATH" \
+  KERNEL="$KERNEL_SRC" \
+  ARCH=arm
+
+# Extract the rootfs tarball
+mkdir -p /tmp/rootfs-inject
+tar -xzf sysdrv/custom_rootfs/$ROOTFS_NAME -C /tmp/rootfs-inject/
+
+# Add the kernel module
+mkdir -p /tmp/rootfs-inject/oem/usr/ko
+cp esp32_spi.ko /tmp/rootfs-inject/oem/usr/ko/
+
+# Repack the rootfs
+cd /tmp/rootfs-inject
+tar -czf "$SDK_ROOT/sysdrv/custom_rootfs/$ROOTFS_NAME" .
+cd "$SDK_ROOT"
+rm -rf /tmp/rootfs-inject
 
 # Copy module to drivers
 # cp esp32_spi.ko "$SDK_ROOT/sysdrv/out/kernel_drv_ko/" || echo "Warning: Could not copy esp32_spi.ko"
@@ -144,7 +158,7 @@ export CROSS_COMPILE=arm-rockchip830-linux-uclibcgnueabihf-
 # Return explicitly to SDK root
 cd "$SDK_ROOT" || exit
 
-# echo "ESP-Hosted driver build complete"
+echo "ESP-Hosted driver build complete"
 # ===== END ESP-HOSTED BUILD =====
 
 # package firmware
@@ -155,8 +169,12 @@ rm -rf output
 mkdir -p output
 cp sdk/output/image/* "output/"
 
+# Debug: check if module is in the firmware
+echo "=== Checking for esp32_spi.ko in firmware ==="
+find output/ -name "esp32_spi.ko"
+
 # Copy ESP-Hosted module to output
-# if [ -f "esp-hosted/esp_hosted_ng/host/esp32_spi.ko" ]; then
-#   cp esp-hosted/esp_hosted_ng/host/esp32_spi.ko output/
-#   echo "ESP-Hosted module copied to output/"
-# fi
+if [ -f "esp-hosted/esp_hosted_ng/host/esp32_spi.ko" ]; then
+  cp esp-hosted/esp_hosted_ng/host/esp32_spi.ko output/
+  echo "ESP-Hosted module copied to output/"
+fi

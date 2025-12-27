@@ -37,6 +37,11 @@ apk add wpa_supplicant
 # python3
 apk add python3
 
+# fix sshd
+mkdir -p /var/empty
+chmod 555 /var/empty
+chown root:root /var/empty
+
 # Clear apk cache
 rm -rf /var/cache/apk/*
 
