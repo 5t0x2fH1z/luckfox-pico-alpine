@@ -25,6 +25,8 @@ start() {
             sleep 2
             udhcpc -i wlan0 -t 5 -q
             sleep 2
+            # update date/time
+            ntpd -d -n -q -p pool.ntp.org
             eend 0
             return 0
         fi
